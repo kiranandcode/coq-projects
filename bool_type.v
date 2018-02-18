@@ -30,3 +30,17 @@ Proof.
         exact I.
 Qed.
 
+Theorem thm_eqb_a_t: (forall a : bool, (Is_true (eqb a true)) -> (Is_true a)).
+Proof.
+        intros a.
+        case a.
+        simpl.
+        intros proof_of_True.
+        exact I.
+        simpl.
+        intros proof_of_False.
+        case proof_of_False.
+Qed.
+
+
+        
