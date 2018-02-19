@@ -43,4 +43,35 @@ Proof.
 Qed.
 
 
-        
+Theorem left_or : (forall A B : Prop, A -> A \/ B).
+Proof.
+        intros A B.
+        intros proof_of_A.
+        pose(proof_of_A_or_B := or_introl proof_of_A : A \/ B).
+        exact proof_of_A_or_B.
+Qed.
+
+
+Theorem right_or : (forall A B : Prop, B -> A \/ B).
+Proof.
+        intros A B.
+        intros proof_of_B.
+        pose (proof_of_A_or_B := or_intror proof_of_B : A \/ B).
+        exact proof_of_A_or_B.
+Qed.
+
+Theorem or_commutes : (forall A B, A \/ B -> B \/ A).
+Proof.
+        intros A B.
+        intros A_or_B.
+        case A_or_B.
+        intros proof_of_A.
+        pose (proof_of_B_or_A := or_intror proof_of_A : B \/ A).
+        exact proof_of_B_or_A.
+        intros proof_of_B.
+        pose (proof_of_B_or_A := or_introl proof_of_B : B \/ A).
+        exact proof_of_B_or_A.
+Qed.
+
+
+
