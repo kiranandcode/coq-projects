@@ -96,5 +96,44 @@ Proof.
 Qed.
 
 
+Theorem and_commutes_again: (forall A B : Prop, A /\ B -> B /\ A).
+Proof.
+        intros A B.
 
+        intros A_and_B.
+
+        destruct A_and_B as [ proof_of_A proof_of_B].
+        refine (conj _ _).
+                exact proof_of_B.
+                exact proof_of_A.
+Qed.
+
+Theorem orb_is_or : (forall a b, Is_true (orb a b) <-> Is_true a \/ Is_true b).
+        intros a b.
+        unfold iff.
+        refine (conj _ _).
+                intros H.
+                case a, b.
+                simpl.
+                refine (or_introl _).
+                        exact I.
+                simpl.
+                exact (or_introl I).
+                exact (or_intror I).
+                simpl in H.
+                case H.
+                intros H.
+                case a,b.
+                simpl.
+                exact I.
+                exact I.
+                exact I.
+                case H.
+                intros A.
+                simpl in A.
+                case A.
+                intros B.
+                simpl in B.
+                case B.
+Qed.
 
