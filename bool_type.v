@@ -74,4 +74,27 @@ Proof.
 Qed.
 
 
+Theorem both_and: (forall A B :  Prop, A -> B -> A /\ B).
+Proof.
+        intros A B.
+        intros HA HB.
+        refine (conj _ _).
+                exact HA.
+                exact HB.
+Qed.
+
+Theorem and_commutes : (forall A B : Prop, A /\ B -> B /\ A).
+Proof.
+        intros A B.
+        intros A_and_B.
+        
+        case A_and_B.
+        intros HA HB.
+        refine (conj _ _).
+                exact HB.
+                exact HA.
+Qed.
+
+
+
 
