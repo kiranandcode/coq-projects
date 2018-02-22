@@ -137,3 +137,33 @@ Theorem orb_is_or : (forall a b, Is_true (orb a b) <-> Is_true a \/ Is_true b).
                 case B.
 Qed.
 
+Theorem andb_is_and : (forall a b, Is_true (andb a b) <-> Is_true a /\ Is_true b).
+Proof.
+        intros a b.
+        unfold iff.
+        refine (conj _ _).
+        intros H.
+        case a, b.
+        exact (conj I I).
+        simpl in H.
+        case H.
+        simpl in H.
+        case H.
+        simpl in H.
+        case H.
+        intros H.
+        case a, b.
+        simpl.
+        exact I.
+        simpl in H.
+        destruct H as [ A B].
+        case B.
+        simpl in H.
+        destruct H as [ A B].
+        case A.
+        destruct H as [ A B].
+        simpl.
+        simpl in A.
+        exact A.
+Qed.
+
