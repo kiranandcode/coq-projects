@@ -208,5 +208,140 @@ Notation "x * y" := (mult x y)
         (at level 40, left associativity) : nat_scope.
 
 
-Check ((0 + 1) + 1).
-End. Playground2.
+Fixpoint beq_nat (n m : nat) : bool :=
+        match n with
+        | O => match m with
+                | O => true
+                | S m' => false
+                end
+        | S n' => match m with
+                | O => false
+                | S m' => beq_nat n' m'
+                end
+        end.
+
+Fixpoint ble_nat (n m : nat) : bool :=
+        match n with
+        | O => true
+        | S n' =>
+                        match m with
+                        | O => false
+                        | S m' => ble_nat n' m'
+                        end
+        end.
+
+Example test_ble_nat1 : (ble_nat 2 2) = true.
+Proof. simpl. reflexivity. Qed.
+
+Example test_ble_nat2 : (ble_nat 2 4) = true.
+Proof. simpl. reflexivity. Qed.
+
+
+Example test_ble_nat3 : (ble_nat 4 2) = false.
+Proof. simpl. reflexivity. Qed.
+
+
+Definition blt_nat (n m : nat) : bool :=
+        match beq_nat n m with
+        | true => false
+        | false => ble_nat n m
+        end.
+
+Example test_blt_nat1 : (blt_nat 2 2) = false.
+Proof.  compute.  reflexivity.  Qed.
+
+Example test_blt_nat2 : (blt_nat 2 4) = true.
+Proof.  compute. reflexivity. Qed.
+
+Example test_blt_nat3 : (blt_nat 4 2) = false.
+Proof.  compute. reflexivity. Qed.
+
+Theorem plus_O_n : forall n : nat, 0 + n = n.
+Proof.  intros n.  simpl.  reflexivity.  Qed.
+
+
+Theorem plus_O_n'' : forall n : nat, 0 + n = n.
+Proof.  intros n.  simpl.  reflexivity.  Qed.
+
+
+Theorem plus_1_l : forall n : nat, 1 + n = S n.
+Proof.  intros n.  unfold plus.  reflexivity.  Qed.
+
+
+Theorem mult_O_l : forall n : nat, 0 * n = 0.
+Proof.  intros n.  unfold mult.  reflexivity.  Qed.  
+
+        
+Theorem plus_id_example : forall n m : nat, n = m -> n + n = m + m.        
+Proof.
+intros n m.
+intros H.
+rewrite <- H. (* rewrite takes a equality expression and rewrites a goal using it *)
+reflexivity.
+Qed.
+
+
+Theorem plus_id_exercise : forall n m o : nat, n = m -> m = o -> n + m = m + o.
+Proof.
+        intros n m o.
+        intros hypothesis_n_equals_m.
+        intros hypothesis_m_equals_o.
+        rewrite <- hypothesis_m_equals_o.
+        rewrite <- hypothesis_n_equals_m.
+        reflexivity.
+Qed.
+
+
+Theorem mult_O_plus : forall n m : nat, (0 + n) * m = n * m.
+Proof.
+        intros n m.
+        rewrite -> plus_O_n.
+        reflexivity.
+Qed.
+
+
+
+Theorem mult_1_plus : forall n m : nat, (1 + n) * m = m + (n * m).
+Proof.
+        intros n m.
+        simpl.
+        reflexivity.
+Qed.
+
+
+Theorem plus_1_neq_0_firsttry :forall n : nat, beq_nat (n + 1) 0 = false.
+Proof.
+        intros n.
+        destruct n as [| n']. 
+        simpl.
+        reflexivity.
+        simpl.
+        reflexivity.
+Qed.
+
+
+Theorem negb_involutive : forall b : bool, negb (negb b) = b.
+Proof.
+        intros b.
+        destruct b.
+        simpl.
+        reflexivity.
+        simpl.
+        reflexivity.
+Qed.
+
+
+Theorem zero_nbeq_plus_1 : forall n : nat, beq_nat 0 (n + 1) = false.
+Proof.
+        intros n.
+        destruct n as [| n'].
+        simpl.
+        reflexivity.
+        simpl.
+        reflexivity.
+Qed.
+
+
+
+
+End Playground2.
