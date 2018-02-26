@@ -453,4 +453,227 @@ reflexivity.
 Qed.
 
 
+Theorem mult_0_r : forall (n : nat), n * 0 = 0.
+Proof.
+        intros n.
+        induction n as [| n'].
+        simpl.
+        reflexivity.
+        simpl.
+        rewrite -> IHn'.
+        reflexivity.
+Qed.
+
+
+Theorem plus_n_Sm : forall (n m : nat), S (n + m) = n + (S m).
+Proof.
+intros n m.
+induction  n.
+simpl.
+reflexivity.
+simpl.
+rewrite -> IHn.
+reflexivity.
+Qed.
+
+
+Theorem plus_comm : forall (n m : nat), n + m  = m + n.
+Proof.
+        intros n m.
+        induction n as [|n'].
+        rewrite -> plus_0_r_firsttry.
+        simpl.
+        reflexivity.
+        simpl.
+        rewrite -> IHn'.
+        rewrite -> plus_n_Sm.
+        reflexivity.
+Qed.
+
+
+Theorem plus_assoc : forall (n m p : nat), n + (m + p) = (n + m) + p.
+Proof.
+        intros n m p.
+        induction n as [|n'].
+        simpl.
+        reflexivity.
+        simpl.
+        rewrite -> IHn'.
+        reflexivity.
+Qed.
+
+
+Fixpoint double (n : nat) :=
+        match n with
+        | O => O
+        | S n' => S ( S ( double n') )
+        end.
+
+Lemma double_plus : forall (n : nat), double n = n + n.
+Proof.
+        intros n.
+        induction n as [|n'].
+        simpl.
+        reflexivity.
+        simpl.
+        rewrite -> IHn'.
+        rewrite -> plus_n_Sm.
+        reflexivity.
+Qed.
+
+Theorem mult_0_plus' : forall (n m : nat), (0 + n) * m = n * m.
+Proof.
+        intros n m.
+        assert (H: 0 + n = n).
+                simpl.
+                reflexivity.
+        rewrite -> H.
+        reflexivity.
+Qed.
+
+
+Theorem plus_rearrange_firsttry : forall (n m p q : nat), (n + m) + (p + q) = (m + n) + (p + q).
+Proof.
+        intros n m p q.
+        assert (n + m = m + n) as H.
+                rewrite -> plus_comm.
+                reflexivity.
+        rewrite -> H.
+        reflexivity.
+Qed.
+
+
+Theorem plus_swap : forall (n m p : nat), n + ( m + p) = m + ( n + p).
+Proof.
+        intros n m p.
+        rewrite -> plus_assoc.
+        rewrite -> plus_assoc.
+        assert (m + n = n + m) as H.
+               rewrite -> plus_comm. 
+               reflexivity.
+        rewrite -> H.
+        reflexivity.
+Qed.
+
+Theorem mult_1 : forall (m : nat), m * 1 = m.
+Proof.
+        intros m.
+        induction m as [|m'].
+        simpl.
+        reflexivity.
+        simpl.
+        rewrite -> IHm'.
+        reflexivity.
+Qed.
+
+Theorem mult_2 : forall (m : nat), m * 2 = m + m.
+Proof.
+        intros m.
+        induction m as [|m'].
+        simpl.
+        reflexivity.
+        simpl.
+        rewrite <- plus_n_Sm.
+        rewrite <- IHm'.
+        reflexivity.
+Qed.
+
+
+Theorem plus_sn : forall (n : nat), S n = n + 1.
+Proof.
+        intros n.
+        induction n.
+        simpl.
+        reflexivity.
+        simpl.
+        rewrite -> IHn.
+        reflexivity.
+Qed.
+
+
+Theorem distrobutivity_l : forall (n a b : nat), n * ( a + b ) = (n * a) + (n * b).
+Proof.
+        intros n a b.
+        induction n.
+        simpl.
+        reflexivity.
+        simpl.
+        rewrite -> plus_assoc.
+        rewrite -> IHn.
+        rewrite -> plus_assoc.
+        assert (b + n * a = n * a + b) as H.
+                rewrite -> plus_comm. 
+                reflexivity.
+        assert (a + b + n * a = a + n * a + b) as H'.
+                rewrite <- plus_assoc.
+                rewrite <- plus_swap.
+                rewrite -> plus_assoc.
+                rewrite <- plus_assoc.
+                rewrite -> plus_comm.
+                reflexivity.
+        rewrite -> H'.
+        reflexivity.
+Qed.
+
+Theorem distrobutivity_r : forall (n a b : nat), (a + b) * n = ( n * a) + ( n * b).
+Proof.
+        intros n a b.
+        induction n.
+        simpl.
+        rewrite -> mult_0_r.
+        reflexivity.
+        simpl.
+        assert (b + n * b = n * b + b) as nb_comm.
+                rewrite -> plus_comm.
+                reflexivity.
+        rewrite -> nb_comm.
+        rewrite -> plus_assoc.
+        assert (a + n * a + n * b + b = a + ( n * a + n * b ) + b) as simpl_h.
+                rewrite -> plus_assoc.
+                reflexivity.
+        rewrite -> simpl_h.
+        rewrite <- IHn.
+        assert ((a + b) * n + b = b + (a + b) * n) as rotate_b.
+                rewrite -> plus_comm.
+                reflexivity.
+        assert (a + ((a + b) * n + b) = a + (a + b) * n + b) as even_simpl.
+                rewrite -> plus_assoc.
+                reflexivity.
+        assert (a + b + (a + b) * n = a + (a + b) * n + b) as rotate.
+                rewrite <- even_simpl.
+                rewrite -> rotate_b.
+                rewrite -> plus_assoc.
+                reflexivity.
+        rewrite <- rotate.
+        assert (a + b + (a + b) * n = (a + b) * (1 + n)).
+                rewrite -> distrobutivity_l.
+                rewrite -> mult_1.
+                reflexivity.
+        rewrite -> H.
+        rewrite -> plus_sn.
+        assert (1 + n = n + 1).
+               rewrite -> plus_sn.
+               reflexivity.
+        rewrite -> H0.
+        reflexivity.
+Qed.       
+
+
+Theorem mult_comm : forall (m n : nat), m * n = n * m.
+Proof.
+        intros m n.
+        induction n as [|n'].
+        rewrite -> mult_0_r.
+        simpl.
+        reflexivity.
+        rewrite -> plus_sn.
+        simpl.
+        rewrite -> distrobutivity_l.
+        rewrite -> plus_comm.
+        rewrite <- distrobutivity_l.
+        rewrite -> plus_comm.
+        rewrite -> distrobutivity_l.
+        rewrite -> distrobutivity_r.
+        reflexivity.
+Qed.
 
