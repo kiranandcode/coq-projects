@@ -342,6 +342,115 @@ Proof.
 Qed.
 
 
+Theorem identity_fn_applied_twice : forall (f : bool -> bool), (forall (x : bool), f x = x) -> forall ( b : bool), f (f b) = b.
+Proof.
+        intros f.
+        intros hypothesis_f_is_ident.
+        intros b.
+        rewrite -> hypothesis_f_is_ident.
+        rewrite -> hypothesis_f_is_ident.
+        reflexivity.
+Qed.
+
+
+Theorem negation_fn_applied_twice : forall (f : bool -> bool), (forall (x : bool), f x = negb x) -> forall (b : bool), f (f b) = b.
+Proof.
+intros f.
+intros hypothesis_f_is_neg.
+intros b.
+rewrite -> hypothesis_f_is_neg.
+rewrite -> hypothesis_f_is_neg.
+unfold negb.
+destruct b.
+simpl.
+reflexivity.
+simpl.
+reflexivity.
+Qed.
+
+
+Theorem andb_eq_orb : forall (b c : bool), (andb b c = orb b c) -> b = c.
+Proof.
+intros b c.
+unfold andb.
+unfold orb. 
+destruct b. 
+intros hypothesis_c_is_true.
+rewrite -> hypothesis_c_is_true. 
+reflexivity.
+intros hypothesis_c_is_false.
+rewrite -> hypothesis_c_is_false.
+reflexivity.
+Qed.
+
+
+Inductive bin : Type :=
+| O : bin
+| Twice : bin -> bin
+| Plus1 : bin -> bin.
+
+Fixpoint increment (x : bin) : bin :=
+        match x with
+        | O => Plus1 O
+        | Plus1 O => Twice (Plus1 O)
+        | Twice n' => Plus1 (Twice n')
+        | Plus1 n' => Plus1 (increment n')
+        end.
+
+Fixpoint toNat ( x : bin ) : nat :=
+match x with
+| O => 0
+| Plus1 n' => 1 + (toNat n')
+| Twice n' => 2 * (toNat n')
+end.
 
 
 End Playground2.
+
+
+Theorem andb_true_eliml : forall ( b c : bool ), andb b c = true -> b = true.
+Proof.
+intros b c H.
+destruct b.
+reflexivity.
+rewrite <- H.
+reflexivity.
+Qed.
+
+
+Theorem andb_true_elim2 : forall (b c : bool), andb b c = true -> c = true.
+Proof.
+intros b c H.
+destruct c.
+reflexivity.
+rewrite <- H.
+destruct b.
+simpl.
+reflexivity.
+reflexivity.
+Qed.
+
+
+Theorem plus_0_r_firsttry : forall (n : nat), n + 0 = n.
+Proof.
+intros n.
+induction n as [| n'].
+reflexivity.
+simpl.
+rewrite -> IHn'.
+reflexivity.
+Qed.
+
+Theorem minus_diag : forall (n : nat), minus n n = 0.
+Proof.
+intros n.
+induction n as [| n'].
+simpl.
+reflexivity.
+simpl.
+rewrite -> IHn'.
+reflexivity.
+Qed.
+
+
+
