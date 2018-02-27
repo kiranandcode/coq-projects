@@ -677,3 +677,292 @@ Proof.
         reflexivity.
 Qed.
 
+
+Inductive natprod : Type := 
+        pair : nat -> nat -> natprod.
+
+Definition fst (p : natprod) : nat :=
+        match p with
+        | pair x y => x
+        end.
+
+Definition snd (p : natprod) : nat :=
+        match p with
+        | pair x y => y
+        end.
+
+Notation "( x , y )" := (pair x y).
+
+Theorem subjective_pairing' : forall (n m : nat), (n,m) = (fst (n,m), snd (n,m)).
+Proof.
+intros n m.
+simpl.
+reflexivity.
+Qed.
+
+Theorem subjective_pairing : forall (p : natprod), p = (fst p, snd p).
+Proof.
+        intros p.
+        destruct p as (n, m).
+        simpl.
+        reflexivity.
+Qed.
+
+Definition swap_pair (p : natprod) : natprod :=
+        match p with
+        | (n, m) => (m,n)
+        end.
+
+Theorem snd_fst_is_swap : forall ( p : natprod), (snd p, fst p) = swap_pair p.
+Proof.
+        intros p.
+        destruct p as (n, m).
+        simpl.
+        reflexivity.
+Qed.
+
+Theorem fst_swap_is_snd : forall ( p : natprod ), fst ( swap_pair p ) = snd p.
+Proof.
+        intros p.
+        destruct p as (n, m).
+        simpl.
+        reflexivity.
+Qed.
+
+
+Inductive natlist : Type := 
+| nil : natlist
+| cons : nat -> natlist -> natlist.
+
+
+Notation "x :: l" := (cons x l) (at level 60, right associativity).
+Notation "[ ]" := nil.
+Notation "[ x , .. , y ]" := (cons x .. (cons y nil) ..).
+
+Fixpoint repeat ( n count : nat ) : natlist :=
+        match count with
+        | O => nil
+        | S count' => n :: (repeat n count')
+        end.
+
+
+Fixpoint length (l : natlist) : nat :=
+        match l with
+        | nil => 0
+        | cons head tail => S (length tail)
+        end.
+
+Fixpoint app (l1 l2 : natlist) : natlist :=
+        match l1 with
+        | nil => l2
+        | cons head tail => cons head (app tail l2)
+        end.
+
+Notation "x ++ y" := (app x y)
+                        (right associativity, at level 60).
+
+Example test_app1: [1,2,3] ++ [4,5] = [1,2,3,4,5].
+Proof.
+        unfold app.
+        reflexivity.
+Qed.
+
+
+Definition head (default : nat) (l : natlist) : nat := 
+        match l with
+        | nil => default
+        | h :: t => h
+        end.
+
+Definition tail (l : natlist) : natlist :=
+        match l with
+        | nil => nil
+        | h :: t => t
+        end.
+
+Fixpoint nonzeros (l : natlist) : natlist :=
+        match l with
+        | nil => nil
+        | h :: t => match h with
+                       | 0 => (nonzeros t) 
+                       | S n' => h :: (nonzeros t)
+                        end
+        end.
+
+
+
+Fixpoint alternate (l1 l2 : natlist) : natlist :=
+        match l1 with
+        | nil => match l2 with
+                | nil => nil
+                | h :: t => h :: t
+                end
+        | h1 :: t1 => match l2 with
+                | nil => h1 :: t1
+                | h2 :: t2 => h1 :: h2 :: (alternate t1 t2)
+                end
+        end.
+
+
+Theorem app_ass : forall (l1 l2 l3 : natlist), (l1 ++ l2) ++ l3 = l1 ++ (l2 ++ l3).
+Proof.
+        intros l1 l2 l3.
+        induction l1 as [| n l1'].
+        simpl.
+        reflexivity.
+        simpl.
+        rewrite -> IHl1'.
+        reflexivity.
+Qed.
+
+Theorem app_length : forall (l1 l2 : natlist), length (l1 ++ l2) = (length l1) + (length l2).
+Proof.
+        intros l1 l2.
+        induction l1 as [| n l1'].
+        simpl.
+        reflexivity.
+        simpl.
+        rewrite -> IHl1'.
+        reflexivity.
+Qed.
+
+Fixpoint snoc (l : natlist) (v : nat) : natlist :=
+        match l with
+        | nil => [v]
+        | h :: t => h :: (snoc t v)
+        end.
+
+Fixpoint rev (l : natlist) : natlist :=
+        match l with
+        | nil => nil
+        | h :: t => snoc (rev t) h
+        end.
+
+
+Example test_rev1 : rev [1,2,3] = [3,2,1].
+Proof.  simpl.  reflexivity.  Qed.
+
+
+Theorem length_snoc : forall (n : nat), forall (l : natlist), length (snoc l n) = S (length l).
+Proof.
+        intros n.
+        intros l.
+        induction l.
+        simpl.
+        reflexivity.
+        simpl.
+        rewrite -> IHl.
+        reflexivity.
+Qed.
+
+
+Theorem rev_length_firsttry : forall (l :natlist), length (rev l) = length l.
+Proof.
+        intros l.
+        induction l.
+        simpl.
+        reflexivity.
+        simpl.
+        rewrite -> length_snoc.
+        simpl.
+        rewrite <- IHl.
+        reflexivity.
+Qed.
+
+
+Theorem app_nil_end : forall (l : natlist), l ++ [] = l.
+Proof.
+        intros l.
+        induction l.
+        simpl.
+        reflexivity.
+        simpl.
+        rewrite -> IHl.
+        reflexivity.
+Qed.
+
+
+Theorem snoc_eqiv_app : forall (l : natlist), forall ( n : nat), snoc l n = l ++ [n].
+Proof.
+        intros l n.
+        induction l.
+        simpl.
+        reflexivity.
+        simpl.
+        rewrite -> IHl.
+        reflexivity.
+Qed.
+
+Theorem rev_distrib : forall (l n : natlist), rev (l ++ n) = (rev n) ++ (rev l).
+Proof.
+        intros n l.
+        induction n.
+        rewrite -> app_nil_end.
+        simpl.
+        reflexivity.
+        simpl.
+        rewrite -> IHn.
+        rewrite -> snoc_eqiv_app.
+        rewrite -> snoc_eqiv_app.
+        rewrite -> app_ass.
+        reflexivity.
+Qed.
+
+
+
+Theorem sub_rev_involutive : forall (l : natlist), forall (n : nat), rev (snoc (rev l) n) = n :: (rev (rev l)).
+Proof.
+        intros l n.
+        induction l.
+        simpl.
+        reflexivity.
+        rewrite -> snoc_eqiv_app.
+        simpl.
+        rewrite -> snoc_eqiv_app.
+        rewrite -> rev_distrib.
+        simpl.
+        rewrite -> rev_distrib.
+        simpl.
+        reflexivity.
+Qed.
+        
+
+Theorem rev_involutive : forall (l : natlist), rev (rev l) = l.
+Proof.
+        intros l.
+        induction l.
+        simpl.
+        reflexivity.
+        simpl.
+        rewrite -> sub_rev_involutive.
+        rewrite -> IHl.
+        reflexivity.
+Qed.
+
+
+Theorem app_app4 : forall (l1 l2 l3 l4 : natlist), l1 ++ (l2 ++ (l3 ++ l4)) = ((l1 ++ l2) ++ l3) ++ l4.
+Proof.
+        intros l1 l2 l3 l4.
+        rewrite -> app_ass.
+        rewrite -> app_ass.
+        reflexivity.
+Qed.
+
+
+Lemma nonzeros_length : forall (l1 l2 : natlist), nonzeros (l1 ++ l2) = (nonzeros l1) ++ (nonzeros l2).
+Proof.
+        intros l1 l2.
+        induction l1.
+        simpl.
+        reflexivity.
+        destruct n.
+        simpl.
+        rewrite -> IHl1.
+        reflexivity.
+        simpl.
+        rewrite -> IHl1.
+        reflexivity.
+Qed.
+
+
+
