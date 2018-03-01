@@ -167,3 +167,28 @@ Proof.
         exact A.
 Qed.
 
+Theorem notb_is_not : (forall a, Is_true (negb a) <-> (~(Is_true a))).
+Proof.
+        intros a.
+        unfold iff.
+        refine (conj _ _).
+        case a.
+        simpl.
+        unfold not.
+        intro PF.
+        intro PT.
+        exact PF.
+        simpl.
+        intros PT.
+        unfold not.
+        intros PF.
+        exact PF.
+        case a.
+        simpl.
+        unfold not.
+        intros PTF.
+        intros T.
+        intros H.
+        unfold not.
+        case a.
+        simpl.
